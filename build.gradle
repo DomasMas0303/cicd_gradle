@@ -15,23 +15,23 @@ jar {
 }
 
 // Custom tasks
-task hello(dependsOn: 'test-custom') {
+task hello {
+    dependsOn 'test-custom'
     doLast {
         println 'Hello task'
     }
 }
 
-task 'test-custom'(dependsOn: 'build') {
+task 'test-custom' {
+    dependsOn 'build'
     doLast {
         println 'Custom test task'
     }
 }
 
 task 'build-custom'(type: Tar) {
+    dependsOn 'build'
     from 'build/libs'
     archiveFileName = "hello-${project.version}.tar.gz"
     compression = Compression.GZIP
 }
-
-// Make sure 'build' task runs before 'build-custom'
-'build-custom'.dependsOn 'build'
