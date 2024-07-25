@@ -1,60 +1,37 @@
 apply plugin: 'java'
-apply plugin: 'distribution'
 
-// Custom tasks
-task buildCustom {
-    dependsOn build
-    description = 'Custom build task that depends on the default build task.'
-    doLast {
-        println 'Executing custom build task...'
-    }
-}
-
-task testCustom {
-    dependsOn test
-    description = 'Custom test task that depends on the default test task.'
-    doLast {
-        println 'Executing custom test task...'
-    }
-}
-
-task hello {
-    dependsOn testCustom
-    description = 'Hello task that depends on the custom test task.'
-    doLast {
-        println 'Hello from custom Gradle task!'
-    }
-}
-
-jar {
-    archiveBaseName.set('hello')
-    archiveVersion.set(project.version.toString())
-}
-
-distributions {
-    main {
-        contents {
-            from jar
-        }
-    }
-}
-
+// Set the project name and version
+archivesBaseName = 'hello'
 version = '1.0'
 
-task createDistribution(type: Zip) {
-    dependsOn build // Ensure build runs before createDistribution
-    from compileJava
-    from processResources
-    into('lib') {
-        from jar
-    }
-    archiveBaseName.set("hello-$version")
-    destinationDirectory.set(file("$buildDir/distributions"))
-    doLast {
-        println 'Creating distribution zip...'
+// Define source compatibility
+sourceCompatibility = 1.8
+
+// Define the main class for the JAR
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.test.Test'
     }
 }
 
-// Run createDistribution after build
-build.finalizedBy(createDistribution)
+// Custom tasks
+task hello(dependsOn: 'test-custom') {
+    doLast {
+        println 'Hello task'
+    }
+}
 
+task 'test-custom'(dependsOn: 'build') {
+    doLast {
+        println 'Custom test task'
+    }
+}
+
+task 'build-custom'(type: Tar) {
+    from 'build/libs'
+    archiveFileName = "hello-${project.version}.tar.gz"
+    compression = Compression.GZIP
+}
+
+// Make sure 'build' task runs before 'build-custom'
+'build-custom'.dependsOn 'build'
