@@ -1,1 +1,56 @@
 apply plugin: 'java'
+
+// tasks
+task buildCustom {
+    dependsOn build
+    description = 'Custom build task that depends on the default build task.'
+    doLast {
+        println 'Executing custom build task...'
+    }
+}
+
+task testCustom {
+    dependsOn test
+    description = 'Custom test task that depends on the default test task.'
+    doLast {
+        println 'Executing custom test task...'
+    }
+}
+
+task hello {
+    dependsOn testCustom
+    description = 'Hello task that depends on the custom test task.'
+    doLast {
+        println 'Hello from custom Gradle task!'
+    }
+}
+
+jar {
+    archiveBaseName.set('hello')
+    archiveVersion.set(project.version.toString())
+}
+
+distributions {
+    main {
+        baseName = 'hello'
+    }
+}
+
+version = '1.0'
+
+task createDistribution(type: Zip) {
+    dependsOn build
+    from compileJava
+    from processResources
+    into('lib') {
+        from jar
+    }
+    archiveBaseName.set("hello-$version")
+    destinationDirectory.set(file("$buildDir/distributions"))
+    doLast {
+        println 'Creating distribution zip...'
+    }
+}
+
+build.dependsOn createDistribution
+
