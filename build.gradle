@@ -1,7 +1,7 @@
 apply plugin: 'java'
-apply plugin: 'distribution' // Apply the distribution plugin
+apply plugin: 'distribution'
 
-// tasks
+// Custom tasks
 task buildCustom {
     dependsOn build
     description = 'Custom build task that depends on the default build task.'
@@ -42,7 +42,7 @@ distributions {
 version = '1.0'
 
 task createDistribution(type: Zip) {
-    dependsOn build
+    dependsOn build // Ensure build runs before createDistribution
     from compileJava
     from processResources
     into('lib') {
@@ -55,5 +55,6 @@ task createDistribution(type: Zip) {
     }
 }
 
-build.dependsOn createDistribution
+// Run createDistribution after build
+build.finalizedBy(createDistribution)
 
