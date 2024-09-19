@@ -4,7 +4,7 @@ apply plugin: 'distribution'
 // Custom tasks
 task buildCustom {
     dependsOn build
-    description = 'Custom build task that depends on the default build task.'
+    description = 'Custom build task that depends on the default build task..'
     doLast {
         println 'Executing custom build task...'
     }
